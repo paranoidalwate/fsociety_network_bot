@@ -107,7 +107,7 @@ class MtprotoProvider(IVPNProvider):
             await self._api.enable_secret(provider_id)
             return True
         except Exception as e:
-            logger.error(f"[ FAIL ] MTProto отключение {provider_id}: {e}.")
+            logger.error(f"[ FAIL ] MTProto активация {provider_id}: {e}.")
             return False
 
     async def revoke_access(self, provider_id: str) -> bool:
@@ -115,7 +115,7 @@ class MtprotoProvider(IVPNProvider):
             await self._api.delete_secret(provider_id)
             return True
         except Exception as e:
-            logger.error(f"[ FAIL ] MTProto отключение {provider_id}: {e}.")
+            logger.error(f"[ FAIL ] MTProto удаление {provider_id}: {e}.")
             return False
 
     async def healthcheck(self) -> bool:
