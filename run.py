@@ -94,7 +94,7 @@ async def main():
     setup_logging()
 
     if not BOT_TOKEN:
-        logger.critical("[ FATAL ] Переменная: \"BOT_TOKEN\" отсутствует. Аварийное завершение процессов.")
+        logger.critical('[ FATAL ] Переменная: "BOT_TOKEN" отсутствует. Аварийное завершение процессов.')
         sys.exit(1)
 
     storage = SQLiteStorage()
