@@ -9,6 +9,7 @@ class IVPNProvider(ABC):
 
     @abstractmethod
     async def create_access(self, client_name: str) -> tuple[str, str]:
+        ...
 
     @abstractmethod
     async def disable_access(self, provider_id: str) -> bool:
