@@ -1,0 +1,19 @@
+services:
+  fsociety-bot:
+    build: .
+    container_name: fsociety_network_bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - TZ=UTC
+      - PYTHONPATH=/app
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import asyncio; from infrastructure.database.db import _fetchone; asyncio.run(_fetchone('SELECT 1'))\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

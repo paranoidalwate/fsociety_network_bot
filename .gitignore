@@ -1,0 +1,40 @@
+# Secrets & Configs
+.env
+config.toml
+secrets.json
+secrets_state.json
+
+# Databases & Backups
+*.db
+*.sqlite
+*.sqlite3
+*-wal
+*-shm
+data/
+backups/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# OS & IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Assets
+assets/*.png
+assets/*.jpg
+assets/*.jpeg
+assets/*.gif
+assets/*.webp
+
+!assets/.gitkeep
+!assets/README.md

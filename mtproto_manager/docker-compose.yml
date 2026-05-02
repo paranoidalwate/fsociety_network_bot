@@ -1,0 +1,16 @@
+services:
+  mtproto-manager:
+    build: .
+    container_name: mtproto-manager
+    restart: unless-stopped
+    pid: "host"
+    environment:
+      - MTPROTO_CONFIG=/opt/mtproto-proxy/config.toml
+      - MTPROTO_DOMAIN=wb.ru
+      - MTPROTO_STATE=/data/secrets_state.json
+    volumes:
+      - /opt/mtproto-proxy:/opt/mtproto-proxy
+      - /run/mtproto-proxy.pid:/run/mtproto-proxy.pid:ro
+      - ./data:/data
+    ports:
+      - "8000:8000"
