@@ -7,7 +7,8 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
-from config import BOT_TOKEN, LOG_LEVEL, VPN_SERVERS, MTPROTO_SERVERS
+from config import BOT_TOKEN, LOG_LEVEL, VPN_SERVERS, MTPROTO_SERVERS, DEV_MODE
+from infrastructure.vpn_providers.mock import MockProvider
 from infrastructure.database.db import init_db, close_db
 from core.crypto import init_crypto
 from core.fsm_storage import SQLiteStorage
@@ -40,29 +41,43 @@ async def on_startup(bot: Bot):
     await init_db()
     init_crypto()
 
-    # Ноды AmneziaWG
-    awg_providers = {}
-    for key, cfg in VPN_SERVERS.items():
-        api = AwgEasyAPI(url=cfg["url"], password=cfg["password"], name=cfg["name"])
-        if await api.healthcheck():
-            awg_providers[key] = AwgEasyProvider(api)
-            logger.info(f"[ OK ] Нода AmneziaWG активна: {key} ({cfg['name']})")
-        else:
-            logger.error(f"[ FAIL ] Нода AmneziaWG недоступна: {key}")
-            await api.close()
+    if DEV_MODE:
+        logger.warning("[ WARNING ] Fsociety Network запушен в режиме разработки.")
+        logger.warning("[ WARNING ] Используются MOCK-провайдеры. Реальные ноды игнорируются.")
+        
+        # Поднимаем фейковые ноды
+        for key, cfg in VPN_SERVERS.items():
+            awg_providers[key] = MockProvider(name=cfg["name"], node_type="AWG")
+            logger.info(f"[ MOCK ] Инициализирована фейковая нода AWG: {key} ({cfg['name']})")
+            
+        for key, cfg in MTPROTO_SERVERS.items():
+            mtproto_providers[key] = MockProvider(name=key, node_type="MTPROTO")
+            logger.info(f"[ MOCK ] Инициализирована фейковая нода MTProto: {key}")
 
-    # Ноды MTProto
-    mtproto_providers = {}
-    for key, cfg in MTPROTO_SERVERS.items():
-        api = MTProtoManagerAPI(
-            url=cfg["url"], proxy_host=cfg["host"], proxy_port=cfg["port"], name=key
-        )
-        if await api.healthcheck():
-            mtproto_providers[key] = MtprotoProvider(api)
-            logger.info(f"[ OK ] Нода MTProto активна: {key} ({cfg['host']})")
-        else:
-            logger.error(f"[ FAIL ] Нода MTProto недоступна: {key}")
-            await api.close()
+    else:
+        # Ноды AmneziaWG
+        awg_providers = {}
+        for key, cfg in VPN_SERVERS.items():
+            api = AwgEasyAPI(url=cfg["url"], password=cfg["password"], name=cfg["name"])
+            if await api.healthcheck():
+                awg_providers[key] = AwgEasyProvider(api)
+                logger.info(f"[ OK ] Нода AmneziaWG активна: {key} ({cfg['name']})")
+            else:
+                logger.error(f"[ FAIL ] Нода AmneziaWG недоступна: {key}")
+                await api.close()
+
+        # Ноды MTProto
+        mtproto_providers = {}
+        for key, cfg in MTPROTO_SERVERS.items():
+            api = MTProtoManagerAPI(
+                url=cfg["url"], proxy_host=cfg["host"], proxy_port=cfg["port"], name=key
+            )
+            if await api.healthcheck():
+                mtproto_providers[key] = MtprotoProvider(api)
+                logger.info(f"[ OK ] Нода MTProto активна: {key} ({cfg['host']})")
+            else:
+                logger.error(f"[ FAIL ] Нода MTProto недоступна: {key}")
+                await api.close()
 
     init_provisioner(awg_providers, mtproto_providers)
     setup_scheduler(bot)
