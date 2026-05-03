@@ -5,7 +5,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config import VPN_SERVERS
+from config import VPN_SERVERS, DEV_MODE
 from infrastructure.vpn_providers.awg_easy import AwgEasyAPI
 from infrastructure.database.db import (
     init_db, close_db, get_all_users, get_user, get_user_devices,
@@ -18,6 +18,9 @@ UNLIMITED_DAYS = 36500
 
 
 async def delete_wg_client(server_name: str, client_uuid: str):
+    if DEV_MODE:
+        return True, f"[ MOCK ] Purged: {client_uuid}"
+
     if server_name not in VPN_SERVERS:
         return False, f"Node {server_name} offline"
     config = VPN_SERVERS[server_name]
