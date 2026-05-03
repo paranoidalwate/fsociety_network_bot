@@ -41,6 +41,9 @@ async def on_startup(bot: Bot):
     await init_db()
     init_crypto()
 
+    awg_providers = {}
+    mtproto_providers = {}
+
     if DEV_MODE:
         logger.warning("[ WARNING ] Fsociety Network запушен в режиме разработки.")
         logger.warning("[ WARNING ] Используются MOCK-провайдеры. Реальные ноды игнорируются.")
