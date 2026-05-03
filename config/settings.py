@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     # Логи
     LOG_LEVEL: str = "INFO"
 
+    # Разработка
+    DEV_MODE: bool = False
+
     # Рассылка
     BROADCAST_BATCH_SIZE: int = 20
     BROADCAST_DELAY: float = 1.5
