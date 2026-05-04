@@ -13,7 +13,7 @@ from infrastructure.database.db import (
 )
 from core.backup import send_backup
 from domain.provisioning import get_provisioner
-from config import DB_BACKUP_HOUR, PAYMENT_EXPIRE_HOURS, SPLIT_TUNNEL_UPDATE_HOURS
+from config import DB_BACKUP_HOUR, PAYMENT_EXPIRE_HOURS
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler(timezone="UTC")
@@ -143,16 +143,6 @@ async def job_backup(bot: Bot):
     await send_backup(bot)
 
 
-async def job_refresh_cidr_feed():
-    logger.info("[ JOB ] Обновление CIDR Split-Tunnel...")
-    try:
-        from core.utils import fetch_blocked_ips
-        await fetch_blocked_ips()
-        logger.info("[ OK ] CIDR обновлен.")
-    except Exception as e:
-        logger.error(f"[ FAIL ] Обновление CIDR: {e}.")
-
-
 def setup_scheduler(bot: Bot):
     scheduler.add_job(
         check_expired_subscriptions, 'cron',
@@ -189,15 +179,10 @@ def setup_scheduler(bot: Bot):
         hour=DB_BACKUP_HOUR, minute=0, args=[bot],
         id='db_backup', replace_existing=True,
     )
-    scheduler.add_job(
-        job_refresh_cidr_feed, 'interval',
-        hours=SPLIT_TUNNEL_UPDATE_HOURS,
-        id='refresh_cidr', replace_existing=True,
-    )
 
     scheduler.start()
     logger.info(
-        "[ OK ] Планировщик активирован. Задачи: expired / expiring / purge_zombies / partial_provision / expire_pending / cleanup_fsm / db_backup / refresh_cidr."
+        "[ OK ] Планировщик активирован. Задачи: expired / expiring / purge_zombies / partial_provision / expire_pending / cleanup_fsm / db_backup."
     )
 
 

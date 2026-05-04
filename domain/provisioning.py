@@ -6,7 +6,6 @@ from typing import Dict, List, Optional, Tuple
 from infrastructure.vpn_providers.base import IVPNProvider
 from infrastructure.database.db import add_device, get_user_devices
 from core.base62 import encode_base62
-from core.utils import inject_split_tunneling
 from core.crypto import encrypt_config
 
 logger = logging.getLogger(__name__)
@@ -78,10 +77,7 @@ class BundleProvisioner:
         try:
             provider_id, raw_config = await provider.create_access(client_name)
 
-            if device_type == "mtproto":
-                config_text = raw_config
-            else:
-                config_text = await inject_split_tunneling(raw_config, device_type=device_type)
+            config_text = raw_config
 
             enc_config = encrypt_config(config_text)
 

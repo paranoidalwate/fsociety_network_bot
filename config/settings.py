@@ -29,13 +29,6 @@ class Settings(BaseSettings):
     SUBSCRIPTION_DAYS: int = 30
     PAYMENT_EXPIRE_HOURS: int = 24
 
-    # Раздельное туннелирование
-    SPLIT_TUNNEL_URL: str = "https://raw.githubusercontent.com/1andrevich/Re-filter-lists/main/ipsum.lst"
-    SPLIT_TUNNEL_UPDATE_HOURS: int = 24
-    COMPACT_MOBILE_CIDRS: str = ""
-    MOBILE_MAX_ALLOWEDIPS_LEN: int = 3000
-    FALLBACK_MOBILE_CIDRS: str = ""
-
     # Мониторинг и алерты
     NODE_ALERT_THRESHOLD: int = 3
     DB_BACKUP_HOUR: int = 4
